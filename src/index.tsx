@@ -6,7 +6,10 @@ type ReturnType = {
   };
 };
 
-export function useDraggable(ref: MutableRefObject<HTMLElement>): ReturnType {
+export function useDraggable(
+  ref: MutableRefObject<HTMLElement>,
+  decayRate = 0.95
+): ReturnType {
   const internalState = useRef({
     lastMouseX: 0,
     isMouseDown: false,
@@ -50,12 +53,12 @@ export function useDraggable(ref: MutableRefObject<HTMLElement>): ReturnType {
     if (didNotReachTheEdges) {
       const keepMoving = setInterval(() => {
         const lastScrollSpeed = internalState.current.scrollSpeed;
-        const newScrollSpeed = lastScrollSpeed * 0.8;
+        const newScrollSpeed = lastScrollSpeed * decayRate;
         internalState.current.scrollSpeed = newScrollSpeed;
 
         runScroll();
 
-        if (Math.abs(newScrollSpeed) < 0.06) {
+        if (Math.abs(newScrollSpeed) < 0.01) {
           internalState.current.scrollSpeed = 0;
           internalState.current.isDragging = false;
           clearInterval(keepMoving);
