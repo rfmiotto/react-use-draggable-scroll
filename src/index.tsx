@@ -11,19 +11,25 @@ export function useDraggable(
   decayRate = 0.95
 ): ReturnType {
   const internalState = useRef({
-    lastMouseX: 0,
     isMouseDown: false,
-    isDragging: false,
-    scrollSpeed: 0,
+    isDraggingX: false,
+    isDraggingY: false,
+    lastMouseX: 0,
+    lastMouseY: 0,
+    scrollSpeedX: 0,
+    scrollSpeedY: 0,
     lastScrollX: 0,
+    lastScrollY: 0,
   });
 
   let maxHorizontalScroll = 0;
+  let maxVerticalScroll = 0;
   let cursorStyleOfWrapperDiv: string;
   let cursorStyleOfChildElements: string[];
 
   useEffect(() => {
     maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
+    maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
 
     cursorStyleOfWrapperDiv = window.getComputedStyle(ref.current).cursor;
 
@@ -38,35 +44,60 @@ export function useDraggable(
   const timing = (1 / 60) * 1000; // period of most monitors (60fps)
 
   const runScroll = () => {
-    const dx = internalState.current.scrollSpeed * timing;
+    const dx = internalState.current.scrollSpeedX * timing;
+    const dy = internalState.current.scrollSpeedY * timing;
     const offsetX = Math.min(maxHorizontalScroll, ref.current.scrollLeft + dx);
+    const offsetY = Math.min(maxVerticalScroll, ref.current.scrollTop + dy);
 
     ref.current.scrollLeft = offsetX; // eslint-disable-line no-param-reassign
+    ref.current.scrollTop = offsetY; // eslint-disable-line no-param-reassign
     internalState.current.lastScrollX = offsetX;
+    internalState.current.lastScrollY = offsetY;
   };
 
   const callbackMomentum = () => {
-    const didNotReachTheEdges =
+    const didNotReachTheHorizontalEdges =
       internalState.current.lastScrollX > 0 &&
       internalState.current.lastScrollX < maxHorizontalScroll;
 
-    if (didNotReachTheEdges) {
-      const keepMoving = setInterval(() => {
-        const lastScrollSpeed = internalState.current.scrollSpeed;
-        const newScrollSpeed = lastScrollSpeed * decayRate;
-        internalState.current.scrollSpeed = newScrollSpeed;
+    const didNotReachTheVerticalEdges =
+      internalState.current.lastScrollY > 0 &&
+      internalState.current.lastScrollY < maxVerticalScroll;
+
+    if (didNotReachTheHorizontalEdges) {
+      const keepMovingX = setInterval(() => {
+        const lastScrollSpeedX = internalState.current.scrollSpeedX;
+        const newScrollSpeedX = lastScrollSpeedX * decayRate;
+        internalState.current.scrollSpeedX = newScrollSpeedX;
 
         runScroll();
 
-        if (Math.abs(newScrollSpeed) < 0.01) {
-          internalState.current.scrollSpeed = 0;
-          internalState.current.isDragging = false;
-          clearInterval(keepMoving);
+        if (Math.abs(newScrollSpeedX) < 0.005) {
+          internalState.current.scrollSpeedX = 0;
+          internalState.current.isDraggingX = false;
+          clearInterval(keepMovingX);
         }
       }, timing);
     }
 
-    internalState.current.isDragging = false;
+    if (didNotReachTheVerticalEdges) {
+      const keepMovingY = setInterval(() => {
+        const lastScrollSpeedY = internalState.current.scrollSpeedY;
+        const newScrollSpeedY = lastScrollSpeedY * decayRate;
+        internalState.current.scrollSpeedY = newScrollSpeedY;
+
+        runScroll();
+
+        if (Math.abs(newScrollSpeedY) < 0.005) {
+          internalState.current.scrollSpeedY = 0;
+          internalState.current.isDraggingY = false;
+          clearInterval(keepMovingY);
+        }
+      }, timing);
+    }
+
+    internalState.current.isDraggingX = false;
+    internalState.current.isDraggingY = false;
   };
 
   const preventClick = (e: Event) => {
@@ -83,12 +114,14 @@ export function useDraggable(
 
     internalState.current.isMouseDown = true;
     internalState.current.lastMouseX = e.clientX;
+    internalState.current.lastMouseY = e.clientY;
 
     ref.current.classList.add("active");
   };
 
   const onMouseUp = () => {
-    if (internalState.current.isDragging) {
+    const isDragging = internalState.current.isDraggingX || internalState.current.isDraggingX;
+    if (isDragging) {
       ref.current.childNodes.forEach((child) => {
         child.addEventListener("click", preventClick);
       });
@@ -100,6 +133,7 @@ export function useDraggable(
 
     internalState.current.isMouseDown = false;
     internalState.current.lastMouseX = 0;
+    internalState.current.lastMouseY = 0;
 
     ref.current.classList.remove("active");
 
@@ -123,8 +157,14 @@ export function useDraggable(
     const dx = internalState.current.lastMouseX - e.clientX;
     internalState.current.lastMouseX = e.clientX;
 
-    internalState.current.scrollSpeed = dx / timing;
-    internalState.current.isDragging = true;
+    internalState.current.scrollSpeedX = dx / timing;
+    internalState.current.isDraggingX = true;
+
+    const dy = internalState.current.lastMouseY - e.clientY;
+    internalState.current.lastMouseY = e.clientY;
+
+    internalState.current.scrollSpeedY = dy / timing;
+    internalState.current.isDraggingY = true;
 
     ref.current.style.cursor = "grabbing"; // eslint-disable-line no-param-reassign
     (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
@@ -138,6 +178,7 @@ export function useDraggable(
 
   const handleResize = () => {
     maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
+    maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
   };
 
   useEffect(() => {
