@@ -1,7 +1,7 @@
 # useDraggable Hook
 
 useDraggable is a React hook that allows a wrapping div to have a draggable scroll with an inertial effect.
-It is completely unstyled and just adds the functionality you are looking for so your application gives 
+It is completely unstyled and just adds the functionality you are looking for so your application gives
 the best user experience possible. It works in both x- and y-coordinate directions.
 
 ### Why useDraggable?
@@ -23,7 +23,11 @@ npm install react-use-draggable-scroll
 
 All you have to do is to create a reference to the wrapping div and pass it as parameter to to the useDraggable hook.
 The hook is totally unstyled. You can use any library of your choice to style the div and the child components as you would normally do.
-In the example below, we use TailwindCSS to illustrate. It is important to set `overflow-x: scroll;` property in the CSS of the wrapping div.
+In the example below, we use TailwindCSS to illustrate.
+
+Just recapping some basics of CSS that you will probably use along with this hook: It is important to set `overflow-x: scroll;`
+property in the CSS of the wrapping div to create the scroll (same goes for y-direction, if that is your case). To prevent a
+flex item from growing or shrinking, use the CSS property `flex: none;`.
 
 
 **In Javascript:**
@@ -32,19 +36,24 @@ import { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
 
 export default function MyComponent() {
-  // We will use React useRef hook to reference the wrapping div:
-  const ref = useRef();
-
-  // Now we pass the reference to the useDraggable hook:
-  const { events } = useDraggable(ref);
+  const ref = useRef();                 // We will use React useRef hook to reference the wrapping div:
+  const { events } = useDraggable(ref); // Now we pass the reference to the useDraggable hook:
 
   return (
     <div
-      className="flex space-x-3 overflow-x-scroll scrollbar-hide" // TailwindCSS
+      className="flex max-w-xl space-x-3 overflow-x-scroll scrollbar-hide"
       {...events}
       ref={ref}   // add reference and events to the wrapping div
     >
-      <div className="flex-none w-32" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
     </div>
   );
 }
@@ -56,27 +65,27 @@ export default function MyComponent() {
 import { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
 
-import { ChildrenComponent } from "@/components/ChildrenComponent";
-
 export default function MyComponent(): JSX.Element {
   // We will use React useRef hook to reference the wrapping div:
   const ref =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
-
-  // Now we pass the reference to the useDraggable hook:
-  const { events } = useDraggable(ref);
+  const { events } = useDraggable(ref); // Now we pass the reference to the useDraggable hook:
 
   return (
     <div
-      className="flex space-x-3 overflow-x-scroll scrollbar-hide" // TailwindCSS
+      className="flex max-w-xl space-x-3 overflow-x-scroll scrollbar-hide"
       {...events}
       ref={ref}   // add reference and events to the wrapping div
     >
-      <ChildrenComponent />
-      <ChildrenComponent />
-      <ChildrenComponent />
-      <ChildrenComponent />
-      <ChildrenComponent />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
+      <div className="flex-none w-52 h-32 bg-red-200" />
     </div>
   );
 }
