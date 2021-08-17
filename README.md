@@ -4,6 +4,10 @@ useDraggable is a React hook that allows a wrapping div to have a draggable scro
 It is completely unstyled and just adds the functionality you are looking for so your application gives
 the best user experience possible. It works in both x- and y-coordinate directions.
 
+
+https://user-images.githubusercontent.com/35971460/129657343-5d3aae09-cf3e-4ec6-9b43-77814c51e580.mp4
+
+
 ### Why useDraggable?
 
 Differently from other hooks designed for the same purpose, this hook does not rely on any state changes. The
