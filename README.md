@@ -2,20 +2,19 @@
 
 useDraggable is a React hook that allows a wrapping div to have a draggable scroll with an inertial effect.
 It is completely unstyled and just adds the functionality you are looking for so your application gives 
-the best user experience possible.
+the best user experience possible. It works in both x- and y-coordinate directions.
 
-### Why should I use useDraggable?
+### Why useDraggable?
 
 Differently from other hooks designed for the same purpose, this hook does not rely on any state changes. The
-funcionality is built entirely on event listeners.
-This means that the wrapping div and its children elements are not re-rendered, resulting in a better performance.
+funcionality is built entirely on event listeners. This means that the wrapping div and its children elements
+are not re-rendered, resulting in a better performance.
 
 ### Installation
 
 ```console
 yarn add react-use-draggable-scroll
 ```
-or
 ```console
 npm install react-use-draggable-scroll
 ```
@@ -32,8 +31,6 @@ In the example below, we use TailwindCSS to illustrate. It is important to set `
 import { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
 
-import { ChildrenComponent } from "@/components/ChildrenComponent";
-
 export default function MyComponent() {
   // We will use React useRef hook to reference the wrapping div:
   const ref = useRef();
@@ -47,11 +44,7 @@ export default function MyComponent() {
       {...events}
       ref={ref}   // add reference and events to the wrapping div
     >
-      <ChildrenComponent />
-      <ChildrenComponent />
-      <ChildrenComponent />
-      <ChildrenComponent />
-      <ChildrenComponent />
+      <div className="flex-none w-32" />
     </div>
   );
 }

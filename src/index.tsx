@@ -72,7 +72,10 @@ export function useDraggable(
 
         runScroll();
 
-        if (Math.abs(newScrollSpeedX) < 0.005) {
+        if (
+          Math.abs(newScrollSpeedX) < 0.005 ||
+          internalState.current.isMouseDown
+        ) {
           internalState.current.scrollSpeedX = 0;
           internalState.current.isDraggingX = false;
           clearInterval(keepMovingX);
@@ -88,7 +91,10 @@ export function useDraggable(
 
         runScroll();
 
-        if (Math.abs(newScrollSpeedY) < 0.005) {
+        if (
+          Math.abs(newScrollSpeedY) < 0.005 ||
+          internalState.current.isMouseDown
+        ) {
           internalState.current.scrollSpeedY = 0;
           internalState.current.isDraggingY = false;
           clearInterval(keepMovingY);
@@ -120,7 +126,8 @@ export function useDraggable(
   };
 
   const onMouseUp = () => {
-    const isDragging = internalState.current.isDraggingX || internalState.current.isDraggingX;
+    const isDragging =
+      internalState.current.isDraggingX || internalState.current.isDraggingX;
     if (isDragging) {
       ref.current.childNodes.forEach((child) => {
         child.addEventListener("click", preventClick);
