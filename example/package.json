@@ -8,6 +8,7 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
+    "parcel-bundler": "^1.12.5",
     "react-app-polyfill": "^1.0.0"
   },
   "alias": {
@@ -18,7 +19,13 @@
   "devDependencies": {
     "@types/react": "^16.9.11",
     "@types/react-dom": "^16.8.4",
-    "parcel": "^1.12.3",
+    "autoprefixer": "^9",
+    "parcel": "1.12.3",
+    "postcss": "^7",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "typescript": "^3.4.5"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
   }
 }

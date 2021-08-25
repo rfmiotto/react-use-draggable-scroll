@@ -24,14 +24,14 @@ export function useDraggable(
 
   let maxHorizontalScroll = 0;
   let maxVerticalScroll = 0;
-  let cursorStyleOfWrapperDiv: string;
+  let cursorStyleOfWrapperElement: string;
   let cursorStyleOfChildElements: string[];
 
   useEffect(() => {
     maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
     maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
 
-    cursorStyleOfWrapperDiv = window.getComputedStyle(ref.current).cursor;
+    cursorStyleOfWrapperElement = window.getComputedStyle(ref.current).cursor;
 
     cursorStyleOfChildElements = [];
     (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
@@ -56,15 +56,15 @@ export function useDraggable(
   };
 
   const callbackMomentum = () => {
-    const didNotReachTheHorizontalEdges =
+    const didNotReachHorizontalEdges =
       internalState.current.lastScrollX > 0 &&
       internalState.current.lastScrollX < maxHorizontalScroll;
 
-    const didNotReachTheVerticalEdges =
+    const didNotReachVerticalEdges =
       internalState.current.lastScrollY > 0 &&
       internalState.current.lastScrollY < maxVerticalScroll;
 
-    if (didNotReachTheHorizontalEdges) {
+    if (didNotReachHorizontalEdges) {
       const keepMovingX = setInterval(() => {
         const lastScrollSpeedX = internalState.current.scrollSpeedX;
         const newScrollSpeedX = lastScrollSpeedX * decayRate;
@@ -83,7 +83,7 @@ export function useDraggable(
       }, timing);
     }
 
-    if (didNotReachTheVerticalEdges) {
+    if (didNotReachVerticalEdges) {
       const keepMovingY = setInterval(() => {
         const lastScrollSpeedY = internalState.current.scrollSpeedY;
         const newScrollSpeedY = lastScrollSpeedY * decayRate;
@@ -121,8 +121,6 @@ export function useDraggable(
     internalState.current.isMouseDown = true;
     internalState.current.lastMouseX = e.clientX;
     internalState.current.lastMouseY = e.clientY;
-
-    ref.current.classList.add("active");
   };
 
   const onMouseUp = () => {
@@ -142,9 +140,7 @@ export function useDraggable(
     internalState.current.lastMouseX = 0;
     internalState.current.lastMouseY = 0;
 
-    ref.current.classList.remove("active");
-
-    ref.current.style.cursor = cursorStyleOfWrapperDiv; // eslint-disable-line no-param-reassign
+    ref.current.style.cursor = cursorStyleOfWrapperElement; // eslint-disable-line no-param-reassign
     (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
       (child: HTMLElement, i) => {
         child.style.cursor = cursorStyleOfChildElements[i]; // eslint-disable-line no-param-reassign
