@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useLayoutEffect, useRef } from "react";
 
 type ReturnType = {
   events: {
@@ -27,7 +27,7 @@ export function useDraggable(
   let cursorStyleOfWrapperElement: string;
   let cursorStyleOfChildElements: string[];
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
     maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
 
