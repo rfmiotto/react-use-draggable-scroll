@@ -118,3 +118,7 @@ const { events } = useDraggable(ref, {
   safeDisplacement: 11,  // specify the drag sensitivity
 });
 ```
+
+### Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
