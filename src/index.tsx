@@ -1,21 +1,19 @@
 import { MutableRefObject, useEffect, useLayoutEffect, useRef } from "react";
 
 type OptionsType = {
-  decayRate?: number,
-  safeDisplacement?: number,
+  decayRate?: number;
+  safeDisplacement?: number;
 };
 
 type ReturnType = {
   events: {
     onMouseDown: (e: React.MouseEvent<HTMLElement>) => void;
-  },
+  };
 };
 
 export function useDraggable(
-  ref: MutableRefObject<HTMLElement>, {
-    decayRate = 0.95,
-    safeDisplacement = 10,
-  }: OptionsType = {},
+  ref: MutableRefObject<HTMLElement>,
+  { decayRate = 0.95, safeDisplacement = 10 }: OptionsType = {}
 ): ReturnType {
   const internalState = useRef({
     isMouseDown: false,
