@@ -95,10 +95,30 @@ export default function MyComponent(): JSX.Element {
 }
 ```
 
-You can also control the decay rate of the inertial effect by using a second (optional)
+You can also control the decay rate of the inertial effect by using an optional
 parameter. The default value is 0.95, which means that at the speed will decay 5% of
 its current value at every 1/60 seconds.
 
 ```typescript
-const { events } = useDraggable(ref, 0.9); // specify the decay rate
+const { events } = useDraggable(ref, {
+  decayRate: 0.96,  // specify the decay rate
+});
 ```
+
+You can also control drag sensitivity by using an optional parameter that states
+the minimum distance in order to distinguish an intentional drag movement from
+an unwanted one, which should be instead considered as a click.
+The default value is 10, which means that when a drag movement travels for 10 pixels
+or less it is considered unintentional. In this scenario, the drag operation would
+still be performed, but the closing mouseup event would still be propagated to the
+rest of DOM.
+
+```typescript
+const { events } = useDraggable(ref, {
+  safeDisplacement: 11,  // specify the drag sensitivity
+});
+```
+
+### Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
