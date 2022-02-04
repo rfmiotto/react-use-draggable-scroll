@@ -8,12 +8,15 @@ type ReturnType = {
 
 export function useDraggable(
   ref: MutableRefObject<HTMLElement>,
+  safeDisplacement = 10,
   decayRate = 0.95
 ): ReturnType {
   const internalState = useRef({
     isMouseDown: false,
     isDraggingX: false,
     isDraggingY: false,
+    initialMouseX: 0,
+    initialMouseY: 0,
     lastMouseX: 0,
     lastMouseY: 0,
     scrollSpeedX: 0,
@@ -121,12 +124,21 @@ export function useDraggable(
     internalState.current.isMouseDown = true;
     internalState.current.lastMouseX = e.clientX;
     internalState.current.lastMouseY = e.clientY;
+    internalState.current.initialMouseX = e.clientX;
+    internalState.current.initialMouseY = e.clientY;
   };
 
-  const onMouseUp = () => {
+  const onMouseUp = (e: MouseEvent) => {
     const isDragging =
       internalState.current.isDraggingX || internalState.current.isDraggingX;
-    if (isDragging) {
+
+    const dx = internalState.current.initialMouseX - e.clientX;
+    const dy = internalState.current.initialMouseY - e.clientY;
+
+    const isMotionIntentional =
+      Math.abs(dx) > safeDisplacement || Math.abs(dy) > safeDisplacement;
+
+    if (isDragging && isMotionIntentional) {
       ref.current.childNodes.forEach((child) => {
         child.addEventListener("click", preventClick);
       });
