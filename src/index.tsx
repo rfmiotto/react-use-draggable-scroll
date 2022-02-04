@@ -144,7 +144,9 @@ export function useDraggable(
     const isMotionIntentional =
       Math.abs(dx) > safeDisplacement || Math.abs(dy) > safeDisplacement;
 
-    if (isDragging && isMotionIntentional) {
+    const isDraggingConfirmed = isDragging && isMotionIntentional;
+
+    if (isDraggingConfirmed) {
       ref.current.childNodes.forEach((child) => {
         child.addEventListener("click", preventClick);
       });
@@ -165,7 +167,9 @@ export function useDraggable(
       }
     );
 
-    callbackMomentum();
+    if (isDraggingConfirmed) {
+      callbackMomentum();
+    }
   };
 
   const onMouseMove = (e: MouseEvent) => {
