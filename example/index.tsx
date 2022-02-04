@@ -9,7 +9,10 @@ import "./styles.css";
 const App = () => {
   const ref =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
-  const { events } = useDraggable(ref);
+  const { events } = useDraggable(ref, {
+    decayRate: 0.96,
+    safeDisplacement: 11,
+  });
 
   return (
     <main className="flex h-screen w-screen justify-center items-center">
