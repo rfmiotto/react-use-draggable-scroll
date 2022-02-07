@@ -3,6 +3,7 @@ import { MutableRefObject, useEffect, useLayoutEffect, useRef } from "react";
 type OptionsType = {
   decayRate?: number;
   safeDisplacement?: number;
+  applyRubberBandEffect?: boolean;
 };
 
 type ReturnType = {
@@ -13,7 +14,11 @@ type ReturnType = {
 
 export function useDraggable(
   ref: MutableRefObject<HTMLElement>,
-  { decayRate = 0.95, safeDisplacement = 10 }: OptionsType = {}
+  {
+    decayRate = 0.95,
+    safeDisplacement = 10,
+    applyRubberBandEffect = false,
+  }: OptionsType = {}
 ): ReturnType {
   const internalState = useRef({
     isMouseDown: false,
@@ -29,32 +34,56 @@ export function useDraggable(
     lastScrollY: 0,
   });
 
+  let isScrollableAlongX = false;
+  let isScrollableAlongY = false;
   let maxHorizontalScroll = 0;
   let maxVerticalScroll = 0;
   let cursorStyleOfWrapperElement: string;
   let cursorStyleOfChildElements: string[];
+  let transformStyleOfChildElements: string[];
+  let transitionStyleOfChildElements: string[];
+
+  const timing = (1 / 60) * 1000; // period of most monitors (60fps)
 
   useLayoutEffect(() => {
+    isScrollableAlongX =
+      window.getComputedStyle(ref.current).overflowX === "scroll";
+    isScrollableAlongY =
+      window.getComputedStyle(ref.current).overflowY === "scroll";
+
     maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
     maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
 
     cursorStyleOfWrapperElement = window.getComputedStyle(ref.current).cursor;
 
     cursorStyleOfChildElements = [];
+    transformStyleOfChildElements = [];
+    transitionStyleOfChildElements = [];
+
     (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
       (child: HTMLElement) => {
         cursorStyleOfChildElements.push(window.getComputedStyle(child).cursor);
+
+        transformStyleOfChildElements.push(
+          window.getComputedStyle(child).transform === "none"
+            ? ""
+            : window.getComputedStyle(child).transform
+        );
+
+        transitionStyleOfChildElements.push(
+          window.getComputedStyle(child).transition === "none"
+            ? ""
+            : window.getComputedStyle(child).transition
+        );
       }
     );
   }, []);
 
-  const timing = (1 / 60) * 1000; // period of most monitors (60fps)
-
   const runScroll = () => {
     const dx = internalState.current.scrollSpeedX * timing;
     const dy = internalState.current.scrollSpeedY * timing;
-    const offsetX = Math.min(maxHorizontalScroll, ref.current.scrollLeft + dx);
-    const offsetY = Math.min(maxVerticalScroll, ref.current.scrollTop + dy);
+    const offsetX = ref.current.scrollLeft + dx;
+    const offsetY = ref.current.scrollTop + dy;
 
     ref.current.scrollLeft = offsetX; // eslint-disable-line no-param-reassign
     ref.current.scrollTop = offsetY; // eslint-disable-line no-param-reassign
@@ -62,55 +91,103 @@ export function useDraggable(
     internalState.current.lastScrollY = offsetY;
   };
 
+  const rubberBandCallback = (e: MouseEvent) => {
+    const dx = e.clientX - internalState.current.initialMouseX;
+    const dy = e.clientY - internalState.current.initialMouseY;
+
+    const { clientWidth } = ref.current;
+
+    let displacementX = 0;
+    let displacementY = 0;
+
+    if (isScrollableAlongX)
+      displacementX =
+        0.3 * clientWidth * Math.log10(1.0 + (0.5 * dx) / clientWidth);
+    if (isScrollableAlongY)
+      displacementY =
+        0.3 * clientWidth * Math.log10(1.0 + (0.5 * dy) / clientWidth);
+
+    (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
+      (child: HTMLElement) => {
+        child.style.transform = `translate3d(${displacementX}px, ${displacementY}px, 0px)`; // eslint-disable-line no-param-reassign
+        child.style.transition = "transform 0ms"; // eslint-disable-line no-param-reassign
+      }
+    );
+  };
+
+  const recoverChildStyle = () => {
+    (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
+      (child: HTMLElement, i) => {
+        child.style.transform = transformStyleOfChildElements[i]; // eslint-disable-line no-param-reassign
+        child.style.transition = transitionStyleOfChildElements[i]; // eslint-disable-line no-param-reassign
+      }
+    );
+  };
+
   const callbackMomentum = () => {
-    const didNotReachHorizontalEdges =
-      internalState.current.lastScrollX > 0 &&
-      internalState.current.lastScrollX < maxHorizontalScroll;
+    const minimumSpeedToTriggerMomentum = 0.05;
 
-    const didNotReachVerticalEdges =
-      internalState.current.lastScrollY > 0 &&
-      internalState.current.lastScrollY < maxVerticalScroll;
+    const keepMovingX = setInterval(() => {
+      const lastScrollSpeedX = internalState.current.scrollSpeedX;
+      const newScrollSpeedX = lastScrollSpeedX * decayRate;
+      internalState.current.scrollSpeedX = newScrollSpeedX;
 
-    if (didNotReachHorizontalEdges) {
-      const keepMovingX = setInterval(() => {
-        const lastScrollSpeedX = internalState.current.scrollSpeedX;
-        const newScrollSpeedX = lastScrollSpeedX * decayRate;
-        internalState.current.scrollSpeedX = newScrollSpeedX;
+      const isAtLeft = ref.current.scrollLeft <= 0;
+      const isAtRight = ref.current.scrollLeft >= maxHorizontalScroll;
+      const hasReachedHorizontalEdges = isAtLeft || isAtRight;
 
-        runScroll();
+      runScroll();
 
-        if (
-          Math.abs(newScrollSpeedX) < 0.005 ||
-          internalState.current.isMouseDown
-        ) {
-          internalState.current.scrollSpeedX = 0;
-          internalState.current.isDraggingX = false;
-          clearInterval(keepMovingX);
+      if (
+        Math.abs(newScrollSpeedX) < minimumSpeedToTriggerMomentum ||
+        internalState.current.isMouseDown ||
+        hasReachedHorizontalEdges
+      ) {
+        internalState.current.scrollSpeedX = 0;
+        clearInterval(keepMovingX);
+
+        if (applyRubberBandEffect) {
+          recoverChildStyle();
         }
-      }, timing);
-    }
+      }
+    }, timing);
 
-    if (didNotReachVerticalEdges) {
-      const keepMovingY = setInterval(() => {
-        const lastScrollSpeedY = internalState.current.scrollSpeedY;
-        const newScrollSpeedY = lastScrollSpeedY * decayRate;
-        internalState.current.scrollSpeedY = newScrollSpeedY;
+    const keepMovingY = setInterval(() => {
+      const lastScrollSpeedY = internalState.current.scrollSpeedY;
+      const newScrollSpeedY = lastScrollSpeedY * decayRate;
+      internalState.current.scrollSpeedY = newScrollSpeedY;
 
-        runScroll();
+      const isAtTop = ref.current.scrollTop <= 0;
+      const isAtBottom = ref.current.scrollTop >= maxVerticalScroll;
+      const hasReachedVerticalEdges = isAtTop || isAtBottom;
 
-        if (
-          Math.abs(newScrollSpeedY) < 0.005 ||
-          internalState.current.isMouseDown
-        ) {
-          internalState.current.scrollSpeedY = 0;
-          internalState.current.isDraggingY = false;
-          clearInterval(keepMovingY);
+      runScroll();
+
+      if (
+        Math.abs(newScrollSpeedY) < minimumSpeedToTriggerMomentum ||
+        internalState.current.isMouseDown ||
+        hasReachedVerticalEdges
+      ) {
+        internalState.current.scrollSpeedY = 0;
+        clearInterval(keepMovingY);
+
+        if (applyRubberBandEffect) {
+          recoverChildStyle();
         }
-      }, timing);
-    }
+      }
+    }, timing);
 
     internalState.current.isDraggingX = false;
     internalState.current.isDraggingY = false;
+
+    if (applyRubberBandEffect) {
+      (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
+        (child: HTMLElement) => {
+          child.style.transform = "translate3d(0px, 0px, 0px)"; // eslint-disable-line no-param-reassign
+          child.style.transition = "transform 250ms"; // eslint-disable-line no-param-reassign
+        }
+      );
+    }
   };
 
   const preventClick = (e: Event) => {
@@ -134,7 +211,7 @@ export function useDraggable(
 
   const onMouseUp = (e: MouseEvent) => {
     const isDragging =
-      internalState.current.isDraggingX || internalState.current.isDraggingX;
+      internalState.current.isDraggingX || internalState.current.isDraggingY;
 
     const dx = internalState.current.initialMouseX - e.clientX;
     const dy = internalState.current.initialMouseY - e.clientY;
@@ -195,6 +272,16 @@ export function useDraggable(
         child.style.cursor = "grabbing"; // eslint-disable-line no-param-reassign
       }
     );
+
+    const isAtLeft = ref.current.scrollLeft <= 0;
+    const isAtRight = ref.current.scrollLeft >= maxHorizontalScroll;
+    const isAtTop = ref.current.scrollTop <= 0;
+    const isAtBottom = ref.current.scrollTop >= maxVerticalScroll;
+    const isAtAnEdge = isAtLeft || isAtRight || isAtTop || isAtBottom;
+
+    if (isAtAnEdge && applyRubberBandEffect) {
+      rubberBandCallback(e);
+    }
 
     runScroll();
   };

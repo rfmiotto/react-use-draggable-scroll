@@ -16,6 +16,7 @@ function TwoDimensionalExample(): JSX.Element {
   const { events } = useDraggable(ref, {
     decayRate: 0.96,
     safeDisplacement: 11,
+    applyRubberBandEffect: true,
   });
 
   return (

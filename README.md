@@ -5,13 +5,12 @@ It is completely unstyled and just adds the functionality you are looking for so
 the best user experience possible. It works in both x- and y-coordinate directions.
 
 
-https://user-images.githubusercontent.com/35971460/129657343-5d3aae09-cf3e-4ec6-9b43-77814c51e580.mp4
-
+<img alt="example gif" src="https://github.com/rfmiotto/react-use-draggable-scroll/blob/main/.github/example.gif" width="480" height="270"/>
 
 ### Why useDraggable?
 
 Differently from other hooks designed for the same purpose, this hook does not rely on any state changes. The
-funcionality is built entirely on event listeners. This means that the wrapping div and its children elements
+functionality is built entirely on event listeners. This means that the wrapping div and its children elements
 are not re-rendered, resulting in a better performance.
 
 ### Installation
