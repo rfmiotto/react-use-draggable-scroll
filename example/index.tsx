@@ -1,35 +1,31 @@
 import "react-app-polyfill/ie11";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { useRef } from "react";
-import { useDraggable } from "../src";
 
 import "./styles.css";
 
-const App = () => {
-  const ref =
-    useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
-  const { events } = useDraggable(ref, {
-    decayRate: 0.96,
-    safeDisplacement: 11,
-  });
+import VerticalExample from "./components/VerticalExample";
+import HorizontalExample from "./components/HorizontalExample";
+import TwoDimensionalExample from "./components/TwoDimensionalExample";
 
+const App = () => {
   return (
-    <main className="flex h-screen w-screen justify-center items-center">
-      <div
-        className="flex max-w-xl space-x-3 overflow-x-scroll"
-        {...events}
-        ref={ref}
-      >
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
-        <div className="flex-none w-52 h-32 bg-red-200" />
+    <main className="flex flex-col max-w-xl mx-auto space-y-4 my-12">
+      <h1 className="text-5xl font-bold">Example of usage</h1>
+
+      <p>
+        <code className="bg-gray-200 rounded-md">
+          react-use-draggable-scroll
+        </code>{" "}
+        does not interfere with other events passing through the same scroll
+        container. In this example, clicking on one of the cards below causes a
+        counter to increase its value.
+      </p>
+
+      <div className="divide-y-2">
+        <HorizontalExample />
+        <VerticalExample />
+        <TwoDimensionalExample />
       </div>
     </main>
   );
