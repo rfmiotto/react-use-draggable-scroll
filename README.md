@@ -94,6 +94,20 @@ export default function MyComponent(): JSX.Element {
 }
 ```
 
+**Additional settings:**
+
+It is possible to toggle a rubber band effect on and off for when the
+user scrolls past the end of the container. This effect is turned off by default to avoid conflicting CSS style rules in code that uses earlier versions of this hook.
+
+```typescript
+const { events } = useDraggable(ref, {
+  applyRubberBandEffect: true,  // activate rubber band effect
+});
+```
+> :warning: **If you are using rubber band effect**: This effect is applied
+> using the `transform` CSS property. User-defined styles can be overridden when `applyRubberBandEffect` is `true` (default value is `false`).
+>
+
 You can also control the decay rate of the inertial effect by using an optional
 parameter. The default value is 0.95, which means that at the speed will decay 5% of
 its current value at every 1/60 seconds.
@@ -104,13 +118,13 @@ const { events } = useDraggable(ref, {
 });
 ```
 
-You can also control drag sensitivity by using an optional parameter that states
+Finally, you can control drag sensitivity by using an optional parameter that states
 the minimum distance in order to distinguish an intentional drag movement from
 an unwanted one, which should be instead considered as a click.
 The default value is 10, which means that when a drag movement travels for 10 pixels
 or less it is considered unintentional. In this scenario, the drag operation would
-still be performed, but the closing mouseup event would still be propagated to the
-rest of DOM.
+still be performed, but the closing mouse-up event would still be propagated to the
+rest of the DOM.
 
 ```typescript
 const { events } = useDraggable(ref, {
