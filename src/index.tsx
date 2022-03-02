@@ -145,10 +145,6 @@ export function useDraggable(
       ) {
         internalState.current.scrollSpeedX = 0;
         clearInterval(keepMovingX);
-
-        if (applyRubberBandEffect) {
-          recoverChildStyle();
-        }
       }
     }, timing);
 
@@ -170,10 +166,6 @@ export function useDraggable(
       ) {
         internalState.current.scrollSpeedY = 0;
         clearInterval(keepMovingY);
-
-        if (applyRubberBandEffect) {
-          recoverChildStyle();
-        }
       }
     }, timing);
 
@@ -181,12 +173,16 @@ export function useDraggable(
     internalState.current.isDraggingY = false;
 
     if (applyRubberBandEffect) {
+      const transitionDurationInMilliseconds = 250;
+
       (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
         (child: HTMLElement) => {
-          child.style.transform = "translate3d(0px, 0px, 0px)"; // eslint-disable-line no-param-reassign
-          child.style.transition = "transform 250ms"; // eslint-disable-line no-param-reassign
+          child.style.transform = `translate3d(0px, 0px, 0px)`; // eslint-disable-line no-param-reassign
+          child.style.transition = `transform ${transitionDurationInMilliseconds}ms`; // eslint-disable-line no-param-reassign
         }
       );
+
+      setTimeout(recoverChildStyle, transitionDurationInMilliseconds);
     }
   };
 
