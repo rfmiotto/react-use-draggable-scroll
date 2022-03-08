@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect, useLayoutEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 
 type OptionsType = {
   decayRate?: number;
@@ -45,7 +45,7 @@ export function useDraggable(
 
   const timing = (1 / 60) * 1000; // period of most monitors (60fps)
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     isScrollableAlongX =
       window.getComputedStyle(ref.current).overflowX === "scroll";
     isScrollableAlongY =
@@ -95,17 +95,35 @@ export function useDraggable(
     const dx = e.clientX - internalState.current.initialMouseX;
     const dy = e.clientY - internalState.current.initialMouseY;
 
-    const { clientWidth } = ref.current;
+    const { clientWidth, clientHeight } = ref.current;
 
     let displacementX = 0;
     let displacementY = 0;
 
-    if (isScrollableAlongX)
+    if (isScrollableAlongX && isScrollableAlongY) {
       displacementX =
-        0.3 * clientWidth * Math.log10(1.0 + (0.5 * dx) / clientWidth);
-    if (isScrollableAlongY)
+        0.3 *
+        clientWidth *
+        Math.sign(dx) *
+        Math.log10(1.0 + (0.5 * Math.abs(dx)) / clientWidth);
       displacementY =
-        0.3 * clientWidth * Math.log10(1.0 + (0.5 * dy) / clientWidth);
+        0.3 *
+        clientHeight *
+        Math.sign(dy) *
+        Math.log10(1.0 + (0.5 * Math.abs(dy)) / clientHeight);
+    } else if (isScrollableAlongX) {
+      displacementX =
+        0.3 *
+        clientWidth *
+        Math.sign(dx) *
+        Math.log10(1.0 + (0.5 * Math.abs(dx)) / clientWidth);
+    } else if (isScrollableAlongY) {
+      displacementY =
+        0.3 *
+        clientHeight *
+        Math.sign(dy) *
+        Math.log10(1.0 + (0.5 * Math.abs(dy)) / clientHeight);
+    }
 
     (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
       (child: HTMLElement) => {
@@ -124,10 +142,14 @@ export function useDraggable(
     );
   };
 
+  let rubberBandAnimationTimer: NodeJS.Timeout;
+  let keepMovingX: NodeJS.Timer;
+  let keepMovingY: NodeJS.Timer;
+
   const callbackMomentum = () => {
     const minimumSpeedToTriggerMomentum = 0.05;
 
-    const keepMovingX = setInterval(() => {
+    keepMovingX = setInterval(() => {
       const lastScrollSpeedX = internalState.current.scrollSpeedX;
       const newScrollSpeedX = lastScrollSpeedX * decayRate;
       internalState.current.scrollSpeedX = newScrollSpeedX;
@@ -148,7 +170,7 @@ export function useDraggable(
       }
     }, timing);
 
-    const keepMovingY = setInterval(() => {
+    keepMovingY = setInterval(() => {
       const lastScrollSpeedY = internalState.current.scrollSpeedY;
       const newScrollSpeedY = lastScrollSpeedY * decayRate;
       internalState.current.scrollSpeedY = newScrollSpeedY;
@@ -182,7 +204,10 @@ export function useDraggable(
         }
       );
 
-      setTimeout(recoverChildStyle, transitionDurationInMilliseconds);
+      rubberBandAnimationTimer = setTimeout(
+        recoverChildStyle,
+        transitionDurationInMilliseconds
+      );
     }
   };
 
@@ -269,10 +294,12 @@ export function useDraggable(
       }
     );
 
-    const isAtLeft = ref.current.scrollLeft <= 0;
-    const isAtRight = ref.current.scrollLeft >= maxHorizontalScroll;
-    const isAtTop = ref.current.scrollTop <= 0;
-    const isAtBottom = ref.current.scrollTop >= maxVerticalScroll;
+    const isAtLeft = ref.current.scrollLeft <= 0 && isScrollableAlongX;
+    const isAtRight =
+      ref.current.scrollLeft >= maxHorizontalScroll && isScrollableAlongX;
+    const isAtTop = ref.current.scrollTop <= 0 && isScrollableAlongY;
+    const isAtBottom =
+      ref.current.scrollTop >= maxVerticalScroll && isScrollableAlongY;
     const isAtAnEdge = isAtLeft || isAtRight || isAtTop || isAtBottom;
 
     if (isAtAnEdge && applyRubberBandEffect) {
@@ -296,6 +323,10 @@ export function useDraggable(
       window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", handleResize);
+
+      clearInterval(keepMovingX);
+      clearInterval(keepMovingY);
+      clearTimeout(rubberBandAnimationTimer);
     };
   }, []);
 
