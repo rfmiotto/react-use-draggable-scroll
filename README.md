@@ -4,6 +4,7 @@ useDraggable is a React hook that allows a wrapping div to have a draggable scro
 It is completely unstyled and just adds the functionality you are looking for so your application gives
 the best user experience possible. It works in both x- and y-coordinate directions.
 
+See [DEMO](https://stackblitz.com/edit/nextjs-tg52v4).
 
 <img alt="example gif" src="https://github.com/rfmiotto/react-use-draggable-scroll/blob/main/.github/example.gif" width="480" height="270"/>
 
