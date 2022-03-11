@@ -1,5 +1,7 @@
 # useDraggable Hook
 
+[![NPM Version](https://img.shields.io/npm/v/react-use-draggable-scroll)](https://www.npmjs.com/package/react-use-draggable-scroll)
+
 useDraggable is a React hook that allows a wrapping div to have a draggable scroll with an inertial effect.
 It is completely unstyled and just adds the functionality you are looking for so your application gives
 the best user experience possible. It works in both x- and y-coordinate directions.
