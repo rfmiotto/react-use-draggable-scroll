@@ -1,4 +1,5 @@
 import { MutableRefObject, useEffect, useRef } from "react";
+import useLayoutEffect from "./useIsomorphicLayoutEffect";
 
 type OptionsType = {
   decayRate?: number;
@@ -45,7 +46,7 @@ export function useDraggable(
 
   const timing = (1 / 60) * 1000; // period of most monitors (60fps)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     isScrollableAlongX =
       window.getComputedStyle(ref.current).overflowX === "scroll";
     isScrollableAlongY =
