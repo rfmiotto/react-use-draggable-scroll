@@ -6,7 +6,7 @@ type OptionsType = {
   decayRate?: number;
   safeDisplacement?: number;
   applyRubberBandEffect?: boolean;
-  activeMouseButton?: "Left" | "Middle" | "Right" 
+  activeMouseButton?: "Left" | "Middle" | "Right";
 };
 
 type ReturnType = {
@@ -21,7 +21,7 @@ export function useDraggable(
     decayRate = 0.95,
     safeDisplacement = 10,
     applyRubberBandEffect = false,
-    activeMouseButton = "Left"
+    activeMouseButton = "Left",
   }: OptionsType = {}
 ): ReturnType {
   const internalState = useRef({
@@ -222,10 +222,12 @@ export function useDraggable(
   };
 
   const getIsMousePressActive = (buttonsCode: number) => {
-    return (activeMouseButton === "Left" && buttonsCode === 1) || 
-    (activeMouseButton === "Middle" && buttonsCode === 4) || 
-    (activeMouseButton === "Right" && buttonsCode === 2)
-  }
+    return (
+      (activeMouseButton === "Left" && buttonsCode === 1) ||
+      (activeMouseButton === "Middle" && buttonsCode === 4) ||
+      (activeMouseButton === "Right" && buttonsCode === 2)
+    );
+  };
 
   const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
     const isMouseActive = getIsMousePressActive(e.buttons);

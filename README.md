@@ -21,6 +21,7 @@ are not re-rendered, resulting in a better performance.
 ```console
 yarn add react-use-draggable-scroll
 ```
+
 ```console
 npm install react-use-draggable-scroll
 ```
@@ -35,21 +36,21 @@ Just recapping some basics of CSS that you will probably use along with this hoo
 property in the CSS of the wrapping div to create the scroll (same goes for y-direction, if that is your case). To prevent a
 flex item from growing or shrinking, use the CSS property `flex: none;`.
 
-
 **In Javascript:**
+
 ```javascript
 import { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
 
 export default function MyComponent() {
-  const ref = useRef();                 // We will use React useRef hook to reference the wrapping div:
+  const ref = useRef(); // We will use React useRef hook to reference the wrapping div:
   const { events } = useDraggable(ref); // Now we pass the reference to the useDraggable hook:
 
   return (
     <div
       className="flex max-w-xl space-x-3 overflow-x-scroll scrollbar-hide"
       {...events}
-      ref={ref}   // add reference and events to the wrapping div
+      ref={ref} // add reference and events to the wrapping div
     >
       <div className="flex-none w-52 h-32 bg-red-200" />
       <div className="flex-none w-52 h-32 bg-red-200" />
@@ -65,8 +66,8 @@ export default function MyComponent() {
 }
 ```
 
-
 **In Typescript:**
+
 ```typescript
 import { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
@@ -81,7 +82,7 @@ export default function MyComponent(): JSX.Element {
     <div
       className="flex max-w-xl space-x-3 overflow-x-scroll scrollbar-hide"
       {...events}
-      ref={ref}   // add reference and events to the wrapping div
+      ref={ref} // add reference and events to the wrapping div
     >
       <div className="flex-none w-52 h-32 bg-red-200" />
       <div className="flex-none w-52 h-32 bg-red-200" />
@@ -97,19 +98,36 @@ export default function MyComponent(): JSX.Element {
 }
 ```
 
-**Additional settings:**
+### Additional settings:
+
+**activeMouseButton: Change which mouse button starts a scroll**
+
+By default, holding left mouse button will start a scroll. However, you can also use the middle or right
+mouse button to start a scroll.
+
+Accepts `"Left" | "Right" | "Middle`
+
+```typescript
+const { events } = useDraggable(ref, {
+    activeMouseButton?: "Middle"; // Sets which mouse button starts a scroll
+});
+```
+
+**applyRubberBandEffect: Rubber Band Effect**
 
 It is possible to toggle a rubber band effect on and off for when the
 user scrolls past the end of the container. This effect is turned off by default to avoid conflicting CSS style rules in code that uses earlier versions of this hook.
 
 ```typescript
 const { events } = useDraggable(ref, {
-  applyRubberBandEffect: true,  // activate rubber band effect
+  applyRubberBandEffect: true, // activate rubber band effect
 });
 ```
+
 > :warning: **If you are using rubber band effect**: This effect is applied
 > using the `transform` CSS property. User-defined styles can be overridden when `applyRubberBandEffect` is `true` (default value is `false`).
->
+
+**decayRate: Control the decay rate of the inertial effect**
 
 You can also control the decay rate of the inertial effect by using an optional
 parameter. The default value is 0.95, which means that at the speed will decay 5% of
@@ -117,9 +135,11 @@ its current value at every 1/60 seconds.
 
 ```typescript
 const { events } = useDraggable(ref, {
-  decayRate: 0.96,  // specify the decay rate
+  decayRate: 0.96, // specify the decay rate
 });
 ```
+
+**safeDisplacement: Control the drag sensitivity**
 
 Finally, you can control drag sensitivity by using an optional parameter that states
 the minimum distance in order to distinguish an intentional drag movement from
@@ -131,7 +151,7 @@ rest of the DOM.
 
 ```typescript
 const { events } = useDraggable(ref, {
-  safeDisplacement: 11,  // specify the drag sensitivity
+  safeDisplacement: 11, // specify the drag sensitivity
 });
 ```
 
