@@ -1,10 +1,12 @@
 import { MutableRefObject, useEffect, useRef } from "react";
+
 import useLayoutEffect from "./useIsomorphicLayoutEffect";
 
 type OptionsType = {
   decayRate?: number;
   safeDisplacement?: number;
   applyRubberBandEffect?: boolean;
+  activeMouseButton?: "Left" | "Middle" | "Right";
 };
 
 type ReturnType = {
@@ -19,6 +21,7 @@ export function useDraggable(
     decayRate = 0.95,
     safeDisplacement = 10,
     applyRubberBandEffect = false,
+    activeMouseButton = "Left",
   }: OptionsType = {}
 ): ReturnType {
   const internalState = useRef({
@@ -218,9 +221,17 @@ export function useDraggable(
     // e.stopPropagation();
   };
 
+  const getIsMousePressActive = (buttonsCode: number) => {
+    return (
+      (activeMouseButton === "Left" && buttonsCode === 1) ||
+      (activeMouseButton === "Middle" && buttonsCode === 4) ||
+      (activeMouseButton === "Right" && buttonsCode === 2)
+    );
+  };
+
   const onMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-    const isLeftMouseButton = e.buttons === 1;
-    if (!isLeftMouseButton) {
+    const isMouseActive = getIsMousePressActive(e.buttons);
+    if (!isMouseActive) {
       return;
     }
 
