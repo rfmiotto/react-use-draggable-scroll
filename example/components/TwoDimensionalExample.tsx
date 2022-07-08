@@ -17,6 +17,7 @@ function TwoDimensionalExample(): JSX.Element {
     decayRate: 0.96,
     safeDisplacement: 11,
     applyRubberBandEffect: true,
+    activeMouseButton: ["Left", "Middle"],
   });
 
   return (

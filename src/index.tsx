@@ -6,8 +6,10 @@ type OptionsType = {
   decayRate?: number;
   safeDisplacement?: number;
   applyRubberBandEffect?: boolean;
-  activeMouseButton?: "Left" | "Middle" | "Right";
+  activeMouseButton?: MouseButtonOptions[] | MouseButtonOptions;
 };
+
+type MouseButtonOptions = "Left" | "Middle" | "Right";
 
 type ReturnType = {
   events: {
@@ -224,8 +226,11 @@ export function useDraggable(
   const getIsMousePressActive = (buttonsCode: number) => {
     return (
       (activeMouseButton === "Left" && buttonsCode === 1) ||
+      (activeMouseButton.includes("Left") && buttonsCode === 1) ||
       (activeMouseButton === "Middle" && buttonsCode === 4) ||
-      (activeMouseButton === "Right" && buttonsCode === 2)
+      (activeMouseButton.includes("Middle") && buttonsCode === 4) ||
+      (activeMouseButton === "Right" && buttonsCode === 2) ||
+      (activeMouseButton.includes("Right") && buttonsCode === 2)
     );
   };
 
