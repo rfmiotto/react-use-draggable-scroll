@@ -7,6 +7,7 @@ import "./styles.css";
 import VerticalExample from "./components/VerticalExample";
 import HorizontalExample from "./components/HorizontalExample";
 import TwoDimensionalExample from "./components/TwoDimensionalExample";
+import WidthMultiRefExample from "./components/WidthMultiRefComponent";
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
         <HorizontalExample />
         <VerticalExample />
         <TwoDimensionalExample />
+        <WidthMultiRefExample />
       </div>
     </main>
   );

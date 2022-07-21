@@ -100,7 +100,7 @@ export default function MyComponent(): JSX.Element {
 
 ### Additional settings:
 
-**activeMouseButton: Change which mouse button starts a scroll**
+**`activeMouseButton`: Change which mouse button starts a scroll**
 
 By default, holding left mouse button will start a scroll. However, you can also use the middle or right
 mouse button to start a scroll.
@@ -113,7 +113,7 @@ const { events } = useDraggable(ref, {
 });
 ```
 
-**applyRubberBandEffect: Rubber Band Effect**
+**`applyRubberBandEffect`: Rubber Band Effect**
 
 It is possible to toggle a rubber band effect on and off for when the
 user scrolls past the end of the container. This effect is turned off by default to avoid conflicting CSS style rules in code that uses earlier versions of this hook.
@@ -127,7 +127,7 @@ const { events } = useDraggable(ref, {
 > :warning: **If you are using rubber band effect**: This effect is applied
 > using the `transform` CSS property. User-defined styles can be overridden when `applyRubberBandEffect` is `true` (default value is `false`).
 
-**decayRate: Control the decay rate of the inertial effect**
+**`decayRate`: Control the decay rate of the inertial effect**
 
 You can also control the decay rate of the inertial effect by using an optional
 parameter. The default value is 0.95, which means that at the speed will decay 5% of
@@ -139,7 +139,7 @@ const { events } = useDraggable(ref, {
 });
 ```
 
-**safeDisplacement: Control the drag sensitivity**
+**`safeDisplacement`: Control the drag sensitivity**
 
 Finally, you can control drag sensitivity by using an optional parameter that states
 the minimum distance in order to distinguish an intentional drag movement from
@@ -152,6 +152,18 @@ rest of the DOM.
 ```typescript
 const { events } = useDraggable(ref, {
   safeDisplacement: 11, // specify the drag sensitivity
+});
+```
+
+**`isMounted`: Determine if ref is available or not, default `true`**
+
+In some use cases, such as you need to use `useImperativeHandle`, 
+you will need to wait for the component to be rendered and the Ref to be accessible before 
+using the `useDraggable` hook. In this case, use `isMounted` as a controllable switch.
+
+```typescript
+const { events } = useDraggable(ref, {
+  isMounted: true, 
 });
 ```
 
