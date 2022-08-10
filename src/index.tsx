@@ -7,6 +7,7 @@ type OptionsType = {
   safeDisplacement?: number;
   applyRubberBandEffect?: boolean;
   activeMouseButton?: "Left" | "Middle" | "Right";
+  isMounted?: boolean;
 };
 
 type ReturnType = {
@@ -22,6 +23,7 @@ export function useDraggable(
     safeDisplacement = 10,
     applyRubberBandEffect = false,
     activeMouseButton = "Left",
+    isMounted = true,
   }: OptionsType = {}
 ): ReturnType {
   const internalState = useRef({
@@ -50,38 +52,42 @@ export function useDraggable(
   const timing = (1 / 60) * 1000; // period of most monitors (60fps)
 
   useLayoutEffect(() => {
-    isScrollableAlongX =
-      window.getComputedStyle(ref.current).overflowX === "scroll";
-    isScrollableAlongY =
-      window.getComputedStyle(ref.current).overflowY === "scroll";
+    if (isMounted) {
+      isScrollableAlongX =
+        window.getComputedStyle(ref.current).overflowX === "scroll";
+      isScrollableAlongY =
+        window.getComputedStyle(ref.current).overflowY === "scroll";
 
-    maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
-    maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
+      maxHorizontalScroll = ref.current.scrollWidth - ref.current.clientWidth;
+      maxVerticalScroll = ref.current.scrollHeight - ref.current.clientHeight;
 
-    cursorStyleOfWrapperElement = window.getComputedStyle(ref.current).cursor;
+      cursorStyleOfWrapperElement = window.getComputedStyle(ref.current).cursor;
 
-    cursorStyleOfChildElements = [];
-    transformStyleOfChildElements = [];
-    transitionStyleOfChildElements = [];
+      cursorStyleOfChildElements = [];
+      transformStyleOfChildElements = [];
+      transitionStyleOfChildElements = [];
 
-    (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
-      (child: HTMLElement) => {
-        cursorStyleOfChildElements.push(window.getComputedStyle(child).cursor);
+      (ref.current.childNodes as NodeListOf<HTMLOptionElement>).forEach(
+        (child: HTMLElement) => {
+          cursorStyleOfChildElements.push(
+            window.getComputedStyle(child).cursor
+          );
 
-        transformStyleOfChildElements.push(
-          window.getComputedStyle(child).transform === "none"
-            ? ""
-            : window.getComputedStyle(child).transform
-        );
+          transformStyleOfChildElements.push(
+            window.getComputedStyle(child).transform === "none"
+              ? ""
+              : window.getComputedStyle(child).transform
+          );
 
-        transitionStyleOfChildElements.push(
-          window.getComputedStyle(child).transition === "none"
-            ? ""
-            : window.getComputedStyle(child).transition
-        );
-      }
-    );
-  }, []);
+          transitionStyleOfChildElements.push(
+            window.getComputedStyle(child).transition === "none"
+              ? ""
+              : window.getComputedStyle(child).transition
+          );
+        }
+      );
+    }
+  }, [isMounted]);
 
   const runScroll = () => {
     const dx = internalState.current.scrollSpeedX * timing;
@@ -327,10 +333,11 @@ export function useDraggable(
   };
 
   useEffect(() => {
-    window.addEventListener("mouseup", onMouseUp);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("resize", handleResize);
-
+    if (isMounted) {
+      window.addEventListener("mouseup", onMouseUp);
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("resize", handleResize);
+    }
     return () => {
       window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("mousemove", onMouseMove);
@@ -340,7 +347,7 @@ export function useDraggable(
       clearInterval(keepMovingY);
       clearTimeout(rubberBandAnimationTimer);
     };
-  }, []);
+  }, [isMounted]);
 
   return {
     events: {
