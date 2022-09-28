@@ -337,13 +337,11 @@ export function useDraggable(
       window.addEventListener("mouseup", onMouseUp);
       window.addEventListener("mousemove", onMouseMove);
       window.addEventListener("resize", handleResize);
-      window.addEventListener("mousedown", preventClick);
     }
     return () => {
       window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousedown", preventClick);
 
       clearInterval(keepMovingX);
       clearInterval(keepMovingY);
